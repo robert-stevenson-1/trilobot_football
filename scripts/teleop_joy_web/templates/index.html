@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <link rel="manifest" href="/manifest.json" />
+    <title>Trilobot Teleop</title>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='main.css') }}"
+    />
+  </head>
+  <body>
+    <main>
+
+      <img src="{{ url_for('video_feed') }}" id="camera" />
+
+      <div class="controls">
+
+          <div id="status1" style="color: red;">Joystick 1</div>
+
+          <div style="border: 1px solid red; width: 128px; position: absolute; left:10px; top:150px;">
+            <img src="{{ url_for('static', filename='images/joystick-base.png') }}"/>    
+
+            <div id="stick1" style="position: absolute; left:32px; top:32px;">
+              <img src="{{ url_for('static', filename='images/joystick-red.png') }}"/>		
+            </div>
+          </div>       
+
+          <button class="btn" id="stop">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M18 18H6V6h12z" />
+            </svg>
+          </button>
+        </div>
+
+        <h1 id="hostname">{{ hostname }}</h1>
+      </div>
+
+      <button id="stop-mobile">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M3 3v18h18V3"/></svg>
+      </button>
+
+    </main>
+
+    <script src="/app.js"></script>
+
+  </body>
+</html>

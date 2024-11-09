@@ -1,0 +1,7 @@
+{
+  "short_name": "Trilobot",
+  "name": "Trilobot Teleop Controller",
+  "display": "standalone",
+  "theme_color": "#333",
+  "background_color": "#333"
+}

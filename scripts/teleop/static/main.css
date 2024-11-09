@@ -1,0 +1,188 @@
+body,
+html {
+    margin: 0;
+    padding: 0;
+    color: white;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #333;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#camera {
+    height: auto;
+    width: 55%;
+    border-radius: 20px;
+    user-select: none;
+    pointer-events: none;
+}
+
+h1 {
+    font-size: 3em;
+    text-align: center;
+    font-style: italic;
+    opacity: 0.1;
+    user-select: none;
+}
+
+.btn {
+    background-color: #48abe0;
+    color: white;
+    border: none;
+    padding: 5px;
+    margin: 10px;
+    font-size: 31px;
+    height: 130px;
+    width: 130px;
+    box-shadow: 0 2px 4px darkslategray;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#stop {
+    background-color: #D00000;
+    box-shadow: 0 2px 4px #520000;
+}
+
+#stop-mobile {
+    display: none;
+}
+
+.btn svg {
+    padding: 10px;
+    opacity: 0.5;
+}
+
+.btn:hover {
+    background-color: #65b9e6;
+}
+
+.btn:hover svg {
+    opacity: 1;
+}
+
+.btn:active {
+    box-shadow: 0 0 2px darkslategray;
+    transform: translateY(2px);
+}
+
+#stop:active {
+    box-shadow: 0 0 2px #520000;
+    transform: translateY(2px);
+}
+
+.btn:active svg {
+    opacity: 1;
+}
+
+main {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px;
+}
+
+#fwd-back {
+    display: flex;
+    flex-direction: column;
+    justify-content: center
+}
+
+#left-right {
+    display: flex;
+}
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    justify-content: center
+}
+
+@media screen and (max-width: 600px) {
+    body {
+        justify-content: flex-start;
+        align-items: flex-start;
+        margin-top: 10px;
+    }
+
+    main {
+        justify-content: space-around;
+        flex-direction: column;
+        margin: 5px;
+        align-items: center
+    }
+
+    #fwd-back,
+    #left-right {
+        flex-direction: row;
+        justify-content: center
+    }
+
+    #camera {
+        order: -1;
+        width: 90%;
+        align-self: center;
+    }
+
+    #fwd-back {
+        order: 3;
+    }
+
+
+    #left-right {
+        order: 2;
+    }
+
+    #left-right .btn {
+        background-color: transparent;
+        outline: #48abe0 solid 2px;
+    }
+
+    #stop {
+        display: none;
+    }
+
+    #stop-mobile {
+        display: block;
+        background-color: #D00000;
+        color: white;
+        border: none;
+        padding: 5px;
+        margin: 10px;
+        font-size: 31px;
+        height: 90px;
+        width: 260px;
+        box-shadow: 0 2px 4px #520000;
+        border-radius: 100px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        order: 9999;
+        margin-top: 20px;
+    }
+
+    #stop-mobile:active {
+        box-shadow: 0 0 2px #520000;
+        transform: translateY(2px);
+    }
+
+    #stop-mobile svg {
+        padding: 10px;
+        opacity: 0.5;
+        width: 80px;
+        height: 80px;
+    }
+
+    #stop-mobile:hover svg {
+        opacity: 1;
+    }
+}

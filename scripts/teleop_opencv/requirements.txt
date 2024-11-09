@@ -1,0 +1,4 @@
+# For this to run youll need to pip install the following things...
+
+Flask
+flask-sock

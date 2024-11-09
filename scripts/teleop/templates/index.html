@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <link rel="manifest" href="/manifest.json" />
+    <title>Trilobot Teleop</title>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='main.css') }}"
+    />
+  </head>
+  <body>
+    <main>
+      <!-- Icons from https://icon-sets.iconify.design/mdi/ -->
+      <div id="fwd-back">
+        <button class="btn" id="up">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path
+              fill="currentColor"
+              d="M15 20H9v-8H4.16L12 4.16L19.84 12H15z"
+            />
+          </svg>
+        </button>
+        <button class="btn" id="down">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M9 4h6v8h4.84L12 19.84L4.16 12H9z" />
+          </svg>
+        </button>
+      </div>
+
+      <img src="{{ url_for('video_feed') }}" id="camera" />
+
+      <div class="controls">
+        <div id="left-right">
+          <button class="btn" id="left">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M20 9v6h-8v4.84L4.16 12L12 4.16V9z"
+              />
+            </svg>
+          </button>
+
+          <button class="btn" id="stop">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M18 18H6V6h12z" />
+            </svg>
+          </button>
+
+          <button class="btn" id="right">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M4 15V9h8V4.16L19.84 12L12 19.84V15z"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <h1 id="hostname">{{ hostname }}</h1>
+      </div>
+
+      <button id="stop-mobile">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M3 3v18h18V3"/></svg>
+      </button>
+
+      <label for="speedSlider" id="speedLabel">Speed (0-1): 0.5</label>
+      <input type="range" id="speedSlider" min="0" max="1" step="0.01" value="0.5">
+
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
