@@ -48,7 +48,9 @@ def Camerafeed():
             if frame is None:
                 print("Failed to decode frame.")
                 continue
-
+            
+            frame = cv2.resize(frame, (1024, 768), 
+               interpolation = cv2.INTER_LINEAR)
             # Display the frame
             cv2.imshow("Receiving Video", frame)
             if cv2.waitKey(1) & 0xFF == 27:  # Exit on 'ESC'
@@ -65,8 +67,8 @@ def Camerafeed():
 def Trilo_joy_map(joy_x, joy_y):
     trilo_x, trilo_y = 0,0
 
-    trilo_x = interp(joy_x, [JOY_MIN, JOY_MAX], [TRILO_MIN, TRILO_MAX])
-    trilo_y = interp(joy_y, [JOY_MIN, JOY_MAX], [TRILO_MIN, TRILO_MAX])
+    trilo_x = round(interp(joy_x, [JOY_MIN, JOY_MAX], [TRILO_MIN, TRILO_MAX]), 2)
+    trilo_y = round(interp(joy_y, [JOY_MIN, JOY_MAX], [TRILO_MIN, TRILO_MAX]), 2)
 
     return trilo_x, trilo_y
 
@@ -103,11 +105,12 @@ def Controller_Input():
 
                     print(f"LEFT_JOY: ({left_x}, {left_y}) | RIGHT_JOY: ({right_x}, {right_y}) | A:{btn_A} B:{btn_B} X:{btn_X} Y:{btn_Y}")
 
-            trilo_x, trilo_y = Trilo_joy_map(joy_x=left_x, joy_y=left_y)
-            print(f"TRILO XY: ({trilo_x}, {trilo_y})")
+            trilo_ly, trilo_ry = Trilo_joy_map(joy_x=left_y, joy_y=right_y)
+
+            print(f"TRILO LY RY: ({trilo_ly}, {trilo_ry})")
 
             # Pack and send controller data
-            controller_data = struct.pack("ff", trilo_x, trilo_y)
+            controller_data = struct.pack("ff", trilo_ly, trilo_ry)
             control_sock.sendall(controller_data)
 
     except KeyboardInterrupt:

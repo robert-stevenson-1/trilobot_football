@@ -5,11 +5,13 @@ import pickle
 import base64
 import multiprocessing
 import picamera2
+from trilobot import Trilobot
 
 # TRILO_IP = socket.gethostbyname(socket.gethostname())
 TRILO_IP = '10.82.0.108'
 CAM_PORT     = 9999
 CONTROLLER_PORT = 9998
+
 
 print(TRILO_IP)
 
@@ -56,7 +58,7 @@ def Trilo_cam():
 
             # DEPLOYMENT DEV
                 picam2 = picamera2.Picamera2()
-                picam2.configure(picam2.create_preview_configuration(main={"format": 'RGB888', "size": (640, 480)})) # opencv works in BGR not RGB
+                picam2.configure(picam2.create_preview_configuration(main={"format": 'RGB888', "size": (360, 240)})) # opencv works in BGR not RGB
                 picam2.start()
 
                 while True:
@@ -68,10 +70,10 @@ def Trilo_cam():
                         f_buffer = f_buffer.tobytes()
                         msg_size = struct.pack("!L", len(f_buffer)) + f_buffer
                         try:
-                            print('msg_size len: ' + str(len(msg_size)) 
-                                + ' | video_data len: ' + str(len(video_data)) 
-                                + ' | encoded_frame len: ' + str(len(f_buffer)))
-                            print(f"Server: Sending frame of size {len(f_buffer)}")
+                            # print('msg_size len: ' + str(len(msg_size)) 
+                            #     + ' | video_data len: ' + str(len(video_data)) 
+                            #     + ' | encoded_frame len: ' + str(len(f_buffer)))
+                            # print(f"Server: Sending frame of size {len(f_buffer)}")
                             client_socket.sendall(msg_size)
                         except socket.error:
                             print("> SOCKET ERROR")
@@ -96,6 +98,22 @@ def Trilo_cam():
 
 # Take controller data recieved over a socket and control the trilobot
 def control():
+
+    tbot = Trilobot()
+    RED = (255, 0, 0)
+    GREEN = (0, 255, 0)
+    BLUE = (0, 0, 255)
+    WHITE = (255, 255, 255)
+    YELLOW = (255, 255, 0)
+    BLACK = (0, 0, 0)
+
+    LIGHT_FRONT_RIGHT = 0
+    LIGHT_FRONT_LEFT = 1
+    LIGHT_MIDDLE_LEFT = 2
+    LIGHT_REAR_LEFT = 3
+    LIGHT_REAR_RIGHT = 4
+    LIGHT_MIDDLE_RIGHT = 5
+
     controller_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     controller_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # Enable address reuse
     controller_sock.bind((TRILO_IP, CONTROLLER_PORT))
@@ -115,13 +133,29 @@ def control():
                         break  # Break the inner loop to accept a new client connection
 
                     # Unpack and process the data
-                    trilo_x, trilo_y = struct.unpack("ff", data)
-                    print(f"Received Controller Data: X={trilo_x}, Y={trilo_y}")
+                    trilo_ly, trilo_ry = struct.unpack("ff", data)
+                    trilo_ly = -1*round(trilo_ly, 2)
+                    trilo_ry = -1*round(trilo_ry, 2)
+                    print(f"Motor Speed: LY={trilo_ly}, RY={trilo_ry}")
+                    
+                    if (trilo_ly < 0.05 and trilo_ry < 0.05) and (trilo_ly > -0.05 and trilo_ry > -0.05):
+                        tbot.stop()
+                    else:
+                        tbot.set_motor_speeds(trilo_ly, trilo_ry)
+
+                    tbot.set_underlight(LIGHT_FRONT_LEFT, WHITE, show=False)
+                    tbot.set_underlight(LIGHT_MIDDLE_LEFT, YELLOW, show=False)
+                    tbot.set_underlight(LIGHT_REAR_LEFT, RED, show=False)
+                    tbot.set_underlight(LIGHT_FRONT_RIGHT, WHITE, show=False)
+                    tbot.set_underlight(LIGHT_MIDDLE_RIGHT, YELLOW, show=False)
+                    tbot.set_underlight(LIGHT_REAR_RIGHT, RED, show=False)
+                    tbot.show_underlighting()
 
             except Exception as e:
                 print(f"Controller handler error: {e}")
             finally:
                 client_socket.close()
+                tbot.stop()
                 print("Controller client connection closed.")
 
     except Exception as e:
