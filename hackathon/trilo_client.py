@@ -15,13 +15,13 @@ TRILO_MAX =  1
 TRILO_MIN = -1
 
 
+# HOST_IP = socket.gethostbyname(socket.gethostname())
+HOST_IP = '10.82.0.108'
 def Camerafeed():
-    # HOST_IP = socket.gethostbyname(socket.gethostname())
-    HOST_IP = '10.82.0.108'
-    PORT    = 9999
+    CAM_PORT = 9999
 
     cam_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    cam_sock.connect((HOST_IP, PORT))
+    cam_sock.connect((HOST_IP, CAM_PORT))
 
     data = b""
     payload_size = struct.calcsize("!L")
@@ -62,7 +62,6 @@ def Camerafeed():
         cv2.destroyAllWindows()
 
 
-
 def Trilo_joy_map(joy_x, joy_y):
     trilo_x, trilo_y = 0,0
 
@@ -75,8 +74,12 @@ def Deadzone_Check(deadzone_threshold, value):
     return True if (value < deadzone_threshold and value > -deadzone_threshold) else False
 
 def Controller_Input():
-    left_x  = 0
-    left_y  = 0
+    CONTROLLER_PORT = 9998
+    control_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    control_sock.connect((HOST_IP, CONTROLLER_PORT))
+
+    left_x = 0
+    left_y = 0
     right_x = 0
     right_y = 0
     btn_A = False
@@ -84,27 +87,37 @@ def Controller_Input():
     btn_X = False
     btn_Y = False
 
+    try:
+        while True:
+            events = get_gamepad()
+            for event in events:
+                if not str(event.code) == "SYN_REPORT":
+                    if str(event.code) == "ABS_X": left_x = event.state
+                    if str(event.code) == "ABS_Y": left_y = event.state
+                    if str(event.code) == "ABS_RX": right_x = event.state
+                    if str(event.code) == "ABS_RY": right_y = event.state
+                    if str(event.code) == "BTN_SOUTH": btn_A = event.state
+                    if str(event.code) == "BTN_EAST": btn_B = event.state
+                    if str(event.code) == "BTN_NORTH": btn_X = event.state
+                    if str(event.code) == "BTN_WEST": btn_Y = event.state
 
-    # data to send to trilobot
-    trilo_x, trilo_y = 0,0
+                    print(f"LEFT_JOY: ({left_x}, {left_y}) | RIGHT_JOY: ({right_x}, {right_y}) | A:{btn_A} B:{btn_B} X:{btn_X} Y:{btn_Y}")
 
-    while True:
-        events = get_gamepad()
-        for event in events:
-            if not str(event.code) == "SYN_REPORT":
-                if str(event.code) == "ABS_X"     : left_x  = event.state
-                if str(event.code) == "ABS_Y"     : left_y  = event.state
-                if str(event.code) == "ABS_RX"    : right_x = event.state
-                if str(event.code) == "ABS_RY"   : right_y = event.state
-                if str(event.code) == "BTN_SOUTH" : btn_A   = event.state
-                if str(event.code) == "BTN_EAST"  : btn_B   = event.state
-                if str(event.code) == "BTN_NORTH" : btn_X   = event.state
-                if str(event.code) == "BTN_WEST"  : btn_Y   = event.state
+            trilo_x, trilo_y = Trilo_joy_map(joy_x=left_x, joy_y=left_y)
+            print(f"TRILO XY: ({trilo_x}, {trilo_y})")
 
-                print(f"LEFT_JOY: ({left_x}, {left_y}) | RIGHT_JOY: ({right_x}, {right_y}) | A:{btn_A} B:{btn_B} X:{btn_X} Y:{btn_Y}") 
+            # Pack and send controller data
+            controller_data = struct.pack("ff", trilo_x, trilo_y)
+            control_sock.sendall(controller_data)
 
-        trilo_x, trilo_y = Trilo_joy_map(joy_x=left_x, joy_y=left_y)
-        print(f"TRILO XY: ({trilo_x}, {trilo_y})")
+    except KeyboardInterrupt:
+        print("Controller input stopped by user.")
+    except Exception as e:
+        print(f"Controller Socket error: {e}")
+    finally:
+        control_sock.close()
+        print("Controller socket closed.")
+
         
 
 camera_process = multiprocessing.Process(target=Camerafeed)
