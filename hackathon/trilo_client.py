@@ -16,14 +16,15 @@ TRILO_MIN = -1
 
 
 def Camerafeed():
-    HOST_IP = socket.gethostbyname(socket.gethostname())
+    # HOST_IP = socket.gethostbyname(socket.gethostname())
+    HOST_IP = '10.82.0.108'
     PORT    = 9999
 
     cam_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     cam_sock.connect((HOST_IP, PORT))
 
     data = b""
-    payload_size = struct.calcsize("Q")
+    payload_size = struct.calcsize("!L")
 
     try:
         while True:
@@ -32,7 +33,7 @@ def Camerafeed():
 
             packed_msg_size = data[:payload_size]
             data = data[payload_size:]
-            unpacked_msg_size = struct.unpack("L", packed_msg_size)[0]
+            unpacked_msg_size = struct.unpack("!L", packed_msg_size)[0]
             
             while len(data) < unpacked_msg_size:
                 data += cam_sock.recv(4*1024)
@@ -42,10 +43,16 @@ def Camerafeed():
             
             # extract the video frame
             frame_data = np.frombuffer(frame_data, np.uint8)
-            frame = cv2.imdecode(frame_data, cv2.IMREAD_COLOR)
+            # Decode the frame
+            frame = cv2.imdecode(np.frombuffer(frame_data, np.uint8), cv2.IMREAD_COLOR)
+            if frame is None:
+                print("Failed to decode frame.")
+                continue
 
-            cv2.imshow("frame", frame)
-            cv2.waitKey(1)
+            # Display the frame
+            cv2.imshow("Receiving Video", frame)
+            if cv2.waitKey(1) & 0xFF == 27:  # Exit on 'ESC'
+                break
 
     except socket.error as e:  # try triggered when connection timed out
         print("ERROR: Connection to Server lost...")
